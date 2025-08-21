@@ -99,49 +99,6 @@ A Django-based web crawler system that can crawl URLs, extract content, and clas
    celery -A webcrawler worker -l info
    ```
 
-## API Usage
-
-### Single URL Crawling
-
-```bash
-curl -X POST http://localhost:8000/api/crawler/crawl_url/ \
-  -H "Content-Type: application/json" \
-  -d '{
-    "url": "https://www.amazon.com/Cuisinart-CPT-122-Compact-2-Slice-Toaster/dp/B009GQ034C/",
-    "extract_content": true,
-    "classify_topics": true,
-    "respect_robots_txt": true
-  }'
-```
-
-### Bulk URL Crawling
-
-```bash
-curl -X POST http://localhost:8000/api/crawler/crawl_bulk/ \
-  -H "Content-Type: application/json" \
-  -d '{
-    "urls": [
-      "https://www.amazon.com/Cuisinart-CPT-122-Compact-2-Slice-Toaster/dp/B009GQ034C/",
-      "https://blog.rei.com/camp/how-to-introduce-your-indoorsy-friend-to-the-outdoors/",
-      "https://www.cnn.com/2013/06/10/politics/edward-snowden-profile/"
-    ],
-    "batch_size": 10
-  }'
-```
-
-### Upload URLs from File
-
-```bash
-curl -X POST http://localhost:8000/api/crawler/crawl_from_file/ \
-  -F "file=@urls.txt"
-```
-
-### Get Crawling Statistics
-
-```bash
-curl http://localhost:8000/api/crawler/stats/
-```
-
 ## API Endpoints
 
 ### Core Crawler Endpoints
@@ -191,15 +148,6 @@ The system has been tested with the following URLs:
    ```
    Expected topics: `['politics', 'technology', 'business']`
 
-### Running Tests
-
-```bash
-# Run all tests
-python manage.py test
-
-# Run specific test
-python manage.py test crawler.tests.test_crawler
-```
 
 ## Configuration
 
@@ -228,7 +176,7 @@ NEW_RELIC_CONFIG_FILE=/app/newrelic.ini
 NEW_RELIC_ENVIRONMENT=development
 
 # Crawler Settings
-CRAWLER_USER_AGENT=WebCrawler/1.0 (+https://github.com/your-repo)
+CRAWLER_USER_AGENT=WebCrawler/1.0 (+https://github.com/repo)
 CRAWLER_REQUEST_TIMEOUT=30
 CRAWLER_MAX_RETRIES=3
 CRAWLER_DELAY_BETWEEN_REQUESTS=1
@@ -242,12 +190,12 @@ The crawler behavior can be configured in `settings.py`:
 
 ```python
 CRAWLER_SETTINGS = {
-    'USER_AGENT': 'WebCrawler/1.0 (+https://github.com/your-repo)',
+    'USER_AGENT': 'WebCrawler/1.0 (+https://github.com/repo)',
     'REQUEST_TIMEOUT': 30,
     'MAX_RETRIES': 3,
-    'DELAY_BETWEEN_REQUESTS': 1,  # seconds
+    'DELAY_BETWEEN_REQUESTS': 1, 
     'RESPECT_ROBOTS_TXT': True,
-    'MAX_CONTENT_LENGTH': 10 * 1024 * 1024,  # 10MB
+    'MAX_CONTENT_LENGTH': 10 * 1024 * 1024, 
 }
 ```
 
@@ -271,7 +219,7 @@ CRAWLER_SETTINGS = {
 
 ### Logs
 
-Logs are available in the Docker containers:
+Logs are available in the Docker containers/ BE_Crawler_backend\logs post containerisation:
 
 ```bash
 # Web application logs
@@ -282,6 +230,11 @@ docker-compose logs celery
 
 # Database logs
 docker-compose logs db
+```
+
+### New Relic 
+```bash 
+   The system support NewRelic as APM, please create your own newrelic.ini file and paste it in root before Containerisation
 ```
 
 ### Health Checks
@@ -373,6 +326,4 @@ DEBUG = True
 4. Add tests
 5. Submit a pull request
 
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
+If you're able to get through all of these steps,congratulations!
