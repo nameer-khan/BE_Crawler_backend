@@ -56,11 +56,49 @@ This document outlines the design for a scalable web crawler system capable of p
 CREATE TABLE websites (
     id BIGSERIAL PRIMARY KEY,
     domain VARCHAR(255) UNIQUE NOT NULL,
+    
+    -- Basic Website Metadata
+    name VARCHAR(255),
+    description TEXT,
+    language VARCHAR(10),
+    country VARCHAR(10),
+    
+    -- Robots.txt and Crawling Metadata
     robots_txt_url TEXT,
     robots_txt_content TEXT,
+    robots_txt_last_checked TIMESTAMP,
     crawl_delay INTEGER DEFAULT 1,
+    max_crawl_depth INTEGER DEFAULT 3,
+    
+    -- Sitemap Metadata
+    sitemap_urls JSONB,                    -- Array of sitemap URLs
+    sitemap_last_checked TIMESTAMP,
+    sitemap_url_count INTEGER DEFAULT 0,
+    
+    -- Technical Metadata
+    server_info JSONB,                     -- Server type, version, etc.
+    technology_stack JSONB,                -- Detected technologies
+    security_headers JSONB,                -- Security headers analysis
+    
+    -- Performance Metadata
+    average_response_time_ms INTEGER,
+    uptime_percentage FLOAT,
+    last_accessible_at TIMESTAMP,
+    
+    -- Content Metadata
+    total_pages INTEGER DEFAULT 0,
+    indexed_pages INTEGER DEFAULT 0,
+    content_types JSONB,                   -- Distribution of content types
+    
+    -- Crawling Configuration
+    crawl_frequency_hours INTEGER DEFAULT 24,
+    priority_level INTEGER DEFAULT 5,      -- 1-10 priority scale
+    is_active BOOLEAN DEFAULT true,
+    
+    -- Timestamps
     created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW()
+    updated_at TIMESTAMP DEFAULT NOW(),
+    last_crawled_at TIMESTAMP
 );
 
 -- Crawled pages table (partitioned by date)
@@ -68,24 +106,81 @@ CREATE TABLE crawled_pages_YYYY_MM (
     id BIGSERIAL,
     url TEXT NOT NULL,
     website_id BIGINT REFERENCES websites(id),
+    
+    -- Basic Content Metadata
     title VARCHAR(500),
     description TEXT,
-    content TEXT,
-    text_content TEXT,
+    keywords TEXT,
+    author VARCHAR(255),
+    language VARCHAR(10),
+    
+    -- Content Storage
+    content TEXT,                          -- Full HTML content
+    text_content TEXT,                     -- Cleaned text content
+    content_hash VARCHAR(64),              -- SHA-256 hash for deduplication
+    
+    -- HTTP Response Metadata
     status_code INTEGER,
     content_type VARCHAR(100),
     content_length BIGINT,
     encoding VARCHAR(50),
-    headers JSONB,
+    http_version VARCHAR(10),
+    response_time_ms INTEGER,              -- Response time in milliseconds
+    
+    -- HTTP Headers (Structured)
+    headers JSONB,                         -- All response headers
+    request_headers JSONB,                 -- Request headers sent
+    cache_headers JSONB,                   -- Cache-related headers (ETag, Last-Modified, etc.)
+    security_headers JSONB,                -- Security headers (CSP, HSTS, etc.)
+    
+    -- SSL/TLS Metadata
+    ssl_certificate JSONB,                 -- SSL certificate details
+    ssl_version VARCHAR(20),
+    ssl_cipher VARCHAR(100),
+    
+    -- Crawling Process Metadata
+    crawl_depth INTEGER DEFAULT 0,         -- How deep in the crawl tree
+    parent_url_id BIGINT,                  -- Reference to parent page
+    discovery_method VARCHAR(50),          -- 'sitemap', 'link', 'manual', 'redirect'
+    crawl_priority INTEGER DEFAULT 5,      -- 1-10 priority scale
+    scheduled_crawl_at TIMESTAMP,          -- Next scheduled crawl
+    
+    -- Redirect Chain Metadata
+    redirect_chain JSONB,                  -- Array of redirect URLs
+    final_url TEXT,                        -- Final URL after redirects
+    redirect_count INTEGER DEFAULT 0,
+    
+    -- Content Analysis Metadata
+    content_structure JSONB,               -- Headings, lists, tables structure
+    media_metadata JSONB,                  -- Images, videos, audio info
+    link_analysis JSONB,                   -- Internal/external link counts
+    word_count INTEGER,                    -- Text word count
+    character_count INTEGER,               -- Text character count
+    
+    -- Quality and Validation Metadata
+    content_freshness_score FLOAT,         -- 0-1 freshness score
+    duplicate_confidence FLOAT,            -- 0-1 duplicate detection confidence
+    quality_score FLOAT,                   -- 0-1 overall quality score
+    accessibility_score FLOAT,             -- 0-1 accessibility compliance
+    
+    -- Classification and Analysis
+    topics JSONB DEFAULT '[]',             -- Topic classification results
+    category VARCHAR(100),
+    sentiment VARCHAR(20),
+    sentiment_score FLOAT,                 -- -1 to 1 sentiment score
+    
+    -- Processing Status
     status VARCHAR(20) DEFAULT 'pending',
     error_message TEXT,
     retry_count INTEGER DEFAULT 0,
-    topics JSONB DEFAULT '[]',
-    category VARCHAR(100),
-    sentiment VARCHAR(20),
+    processing_time_ms INTEGER,            -- Total processing time
+    
+    -- Timestamps
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
     crawled_at TIMESTAMP,
+    last_modified_at TIMESTAMP,            -- From HTTP Last-Modified header
+    
     PRIMARY KEY (id, created_at)
 ) PARTITION BY RANGE (created_at);
 
@@ -128,6 +223,84 @@ CREATE TABLE page_topics (
     confidence_score FLOAT DEFAULT 0.0,
     created_at TIMESTAMP DEFAULT NOW()
 );
+
+-- Media metadata storage
+CREATE TABLE page_media (
+    id BIGSERIAL PRIMARY KEY,
+    page_id BIGINT NOT NULL,
+    media_type VARCHAR(50),                -- 'image', 'video', 'audio', 'document'
+    media_url TEXT NOT NULL,
+    alt_text TEXT,
+    title TEXT,
+    file_size BIGINT,
+    dimensions JSONB,                      -- Width, height for images/videos
+    duration INTEGER,                      -- Duration in seconds for video/audio
+    format VARCHAR(20),
+    quality_score FLOAT,                   -- 0-1 quality assessment
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Link metadata storage
+CREATE TABLE page_links (
+    id BIGSERIAL PRIMARY KEY,
+    page_id BIGINT NOT NULL,
+    link_url TEXT NOT NULL,
+    link_text TEXT,
+    link_type VARCHAR(50),                 -- 'internal', 'external', 'nofollow'
+    anchor_text TEXT,
+    link_position JSONB,                   -- Position in page structure
+    link_importance FLOAT,                 -- 0-1 importance score
+    is_broken BOOLEAN DEFAULT false,
+    last_checked_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Content quality metadata
+CREATE TABLE content_quality_metrics (
+    id BIGSERIAL PRIMARY KEY,
+    page_id BIGINT NOT NULL,
+    readability_score FLOAT,               -- Flesch reading ease score
+    grammar_score FLOAT,                   -- Grammar quality score
+    spelling_score FLOAT,                  -- Spelling accuracy score
+    content_completeness FLOAT,            -- 0-1 completeness score
+    content_relevance FLOAT,               -- 0-1 relevance to page topic
+    seo_score FLOAT,                       -- SEO optimization score
+    accessibility_score FLOAT,             -- WCAG compliance score
+    mobile_friendliness FLOAT,             -- Mobile optimization score
+    load_time_score FLOAT,                 -- Page load performance score
+    overall_quality_score FLOAT,           -- Composite quality score
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Crawling session metadata
+CREATE TABLE crawl_sessions (
+    id BIGSERIAL PRIMARY KEY,
+    job_id BIGINT REFERENCES crawl_jobs(id),
+    session_start TIMESTAMP,
+    session_end TIMESTAMP,
+    total_requests INTEGER,
+    successful_requests INTEGER,
+    failed_requests INTEGER,
+    average_response_time_ms INTEGER,
+    bandwidth_used_mb FLOAT,
+    user_agent VARCHAR(500),
+    ip_address INET,
+    session_metadata JSONB,                -- Additional session-specific data
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Error and exception metadata
+CREATE TABLE crawl_errors (
+    id BIGSERIAL PRIMARY KEY,
+    page_id BIGINT,
+    error_type VARCHAR(100),               -- 'connection_timeout', 'ssl_error', 'content_parsing', etc.
+    error_code VARCHAR(50),
+    error_message TEXT,
+    error_context JSONB,                   -- Additional error context
+    retry_count INTEGER DEFAULT 0,
+    resolved_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT NOW()
+);
 ```
 
 ### Database Partitioning Strategy
@@ -135,6 +308,63 @@ CREATE TABLE page_topics (
 1. **Time-based Partitioning**: Crawled pages partitioned by month
 2. **Domain-based Partitioning**: Separate tables for high-traffic domains
 3. **Archive Strategy**: Move old data to cheaper storage
+
+### Metadata Storage Strategy
+
+#### Comprehensive Metadata Categories
+
+1. **HTTP and Network Metadata**
+   - Response headers, status codes, timing information
+   - SSL/TLS certificate details and security headers
+   - Redirect chains and final URL resolution
+   - Request/response timing and performance metrics
+
+2. **Content Analysis Metadata**
+   - Language detection and character encoding
+   - Content structure analysis (headings, lists, tables)
+   - Media metadata (images, videos, documents)
+   - Link analysis (internal/external, broken links)
+   - Word count, character count, readability scores
+
+3. **Quality and Validation Metadata**
+   - Content freshness and duplicate detection
+   - SEO optimization scores and accessibility compliance
+   - Grammar, spelling, and content completeness
+   - Mobile friendliness and load time performance
+
+4. **Crawling Process Metadata**
+   - Crawl depth, discovery method, priority levels
+   - Parent-child URL relationships
+   - Session information and bandwidth usage
+   - Error tracking and retry mechanisms
+
+5. **Classification and Analysis Metadata**
+   - Topic classification with confidence scores
+   - Sentiment analysis and category assignment
+   - Content relevance and quality assessments
+
+#### Metadata Storage Optimization
+
+1. **JSONB for Flexible Metadata**
+   - Use JSONB for complex, variable metadata structures
+   - Enable efficient querying and indexing on JSONB fields
+   - Support for nested metadata objects
+
+2. **Structured Fields for Common Queries**
+   - Store frequently queried metadata in dedicated columns
+   - Enable efficient indexing and filtering
+   - Support for range queries and aggregations
+
+3. **Separate Tables for Large Metadata**
+   - Media metadata in dedicated `page_media` table
+   - Link metadata in dedicated `page_links` table
+   - Quality metrics in dedicated `content_quality_metrics` table
+   - Error tracking in dedicated `crawl_errors` table
+
+4. **Metadata Compression and Archival**
+   - Compress old metadata using database compression
+   - Archive detailed metadata to cheaper storage
+   - Maintain summary metadata for historical analysis
 
 ## Scalability Design
 
@@ -241,6 +471,7 @@ def crawl_single_url(self, url: str, job_id: int = None):
 
 #### Monitoring and Alerting
 - **Application metrics**: Response times, error rates
+- **Tools for Application metrics**: New Relic, Prometheous, Grafana , ELK stack
 - **Infrastructure metrics**: CPU, memory, disk usage
 - **Business metrics**: URLs processed, success rates
 
