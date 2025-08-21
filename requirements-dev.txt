@@ -1,0 +1,42 @@
+# Core Django and DRF
+Django==4.2.7
+djangorestframework==3.14.0
+django-cors-headers==4.3.1
+django-celery-beat==2.5.0
+django-redis==5.4.0
+
+# Database
+psycopg2-binary==2.9.9
+
+# Redis and Celery
+redis==5.0.1
+celery==5.3.4
+
+# HTTP and HTML parsing
+requests==2.31.0
+beautifulsoup4==4.12.2
+lxml==4.9.3
+aiohttp==3.9.1
+
+# Content extraction (lighter alternative to newspaper3k)
+readability-lxml==0.8.1
+
+# Basic text processing (lighter than full NLTK)
+textblob==0.17.1
+
+# Environment and utilities
+python-dotenv==1.0.0
+
+# Testing
+pytest==7.4.3
+pytest-django==4.7.0
+
+# Production server
+gunicorn==21.2.0
+whitenoise==6.6.0
+
+# API Documentation
+drf-spectacular==0.27.0
+
+# Monitoring
+newrelic==9.4.0

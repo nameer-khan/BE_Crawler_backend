@@ -1,0 +1,349 @@
+WEB CRAWLER API USAGE GUIDE
+============================
+
+This guide will help you use the Web Crawler API step by step. Each section explains what the API does and how to use it.
+
+PREREQUISITES:
+- The application should be running at http://localhost:8000
+- You can use tools like Postman, curl, or any API testing tool , or Swagger too
+- All requests should be sent to the base URL: http://localhost:8000/api/
+
+================================================================================
+1. GETTING STARTED - API OVERVIEW
+================================================================================
+
+Step 1.1: Check API Status
+- URL: http://localhost:8000/api/
+- Method: GET
+- Purpose: Verify the API is working and see all available endpoints
+- What you'll get: A list of all available API endpoints and documentation links
+
+Step 1.2: View API Documentation
+- Swagger UI: http://localhost:8000/api/docs/
+- Purpose: Interactive documentation to test APIs directly in the browser
+
+================================================================================
+2. CRAWLING A SINGLE URL
+================================================================================
+
+Step 2.1: Crawl a Single URL
+- URL: http://localhost:8000/api/crawler/url/
+- Method: POST
+- Content-Type: application/json
+- Purpose: Crawl one website and get immediate results
+
+Request Body Example:
+{
+    "url": "http://www.amazon.com/Cuisinart-CPT-122-Compact-2-Slice-Toaster/dp/B009GQ034C/ref=sr_1_1?s=kitchen&ie=UTF8&qid=1431620315&sr=1-1&keywords=toaster",
+    "extract_content": true,
+    "classify_topics": true,
+    "respect_robots_txt": true
+}
+
+Parameters Explained:
+- url: The website you want to crawl (required)
+- extract_content: Whether to extract the page content (default: true)
+- classify_topics: Whether to automatically classify the page topics (default: true)
+- respect_robots_txt: Whether to follow the website's robots.txt rules (default: true)
+
+What you'll get:
+- Page title, description, and content preview
+- Extracted topics (if classification is enabled)
+- HTTP status code and content type
+- Processing time and crawl timestamp
+
+================================================================================
+3. CRAWLING MULTIPLE URLS (BULK CRAWLING)
+================================================================================
+
+Step 3.1: Start a Bulk Crawl Job
+- URL: http://localhost:8000/api/crawler/bulk/
+- Method: POST
+- Content-Type: application/json
+- Purpose: Crawl multiple URLs in the background
+
+Request Body Example:
+{
+    "urls": [
+        "http://www.amazon.com/Cuisinart-CPT-122-Compact-2-Slice-Toaster/dp/B009GQ034C/",
+        "https://blog.rei.com/camp/how-to-introduce-your-indoorsy-friend-to-the-outdoors/",
+        "https://www.cnn.com/2013/06/10/politics/edward-snowden-profile/"
+    ],
+    "batch_size": 5,
+    "classify_topics": true,
+    "extract_content": true,
+    "respect_robots_txt": true
+}
+
+Parameters Explained:
+- urls: List of websites to crawl (required)
+- batch_size: How many URLs to process at once (default: 10)
+- classify_topics: Whether to automatically classify page topics (default: true)
+- extract_content: Whether to extract page content (default: true)
+- respect_robots_txt: Whether to follow the website's robots.txt rules (default: true)
+
+What you'll get:
+- Job ID for tracking progress
+- Total number of URLs to be processed
+- Status confirmation that the job has been queued
+- Topics will be automatically extracted and stored for each page
+
+Step 3.2: Check Job Status
+- URL: http://localhost:8000/api/jobs/{job_id}/status/
+- Method: GET
+- Purpose: Monitor the progress of your bulk crawl job
+
+Replace {job_id} with the actual job ID you received in Step 3.1
+
+What you'll get:
+- Current job status (pending, running, completed, failed)
+- Progress percentage
+- Number of URLs processed, successful, and failed
+- Start and completion times
+
+Step 3.3: Get All Jobs List
+- URL: http://localhost:8000/api/jobs/
+- Method: GET
+- Purpose: See all your crawl jobs and their statuses
+
+Optional Query Parameters:
+- page: Page number for pagination (default: 1)
+- page_size: Number of jobs per page (default: 20)
+
+What you'll get:
+- List of all crawl jobs with their statuses
+- Pagination information
+- Job details like name, description, and progress
+
+================================================================================
+4. CRAWLING FROM A FILE
+================================================================================
+
+Step 4.1: Upload a File with URLs
+- URL: http://localhost:8000/api/crawler/file/
+- Method: POST
+- Content-Type: multipart/form-data
+- Purpose: Crawl URLs listed in a text file
+
+File Format: Create a .txt file with one URL per line
+Example file content:
+https://example1.com
+https://example2.com
+https://example3.com
+
+Request:
+- Use form-data with key "file" and upload your .txt file
+
+What you'll get:
+- Job ID for tracking
+- Total number of URLs found in the file
+- Confirmation that the crawl job has started
+
+================================================================================
+5. MONITORING AND TRACKING
+================================================================================
+
+Step 5.1: Get Overall Statistics
+- URL: http://localhost:8000/api/crawler/stats/
+- Method: GET
+- Purpose: View overall crawling statistics and system health
+
+What you'll get:
+- Total pages crawled, successful, and failed
+- Website statistics
+- Job statistics (total, active, completed)
+- Topic statistics
+
+Step 5.2: View Crawled Pages
+- URL: http://localhost:8000/api/pages/
+- Method: GET
+- Purpose: Browse all crawled pages
+
+Optional Query Parameters:
+- page: Page number for pagination (default: 1)
+- page_size: Number of pages per page (default: 20)
+- status: Filter by status (completed, failed, pending)
+- website_id: Filter by specific website
+- search: Search in page titles and content
+
+What you'll get:
+- List of all crawled pages with their details
+- Page titles, URLs, status, and crawl timestamps
+- Pagination information
+
+Step 5.3: Get Specific Page Details
+- URL: http://localhost:8000/api/pages/{page_id}/
+- Method: GET
+- Purpose: Get detailed information about a specific crawled page
+
+Replace {page_id} with the actual page ID
+
+What you'll get:
+- Complete page information including content
+- Extracted topics
+- HTTP response details
+- Crawl metadata
+
+================================================================================
+6. WEBSITE MANAGEMENT
+================================================================================
+
+Step 6.1: View All Websites
+- URL: http://localhost:8000/api/websites/
+- Method: GET
+- Purpose: See all websites that have been crawled
+
+Optional Query Parameters:
+- page: Page number for pagination (default: 1)
+- page_size: Number of websites per page (default: 20)
+
+What you'll get:
+- List of all websites with their domains
+- Crawling statistics for each website
+- Number of pages crawled per website
+
+================================================================================
+7. TOPIC MANAGEMENT
+================================================================================
+
+Step 7.1: View All Topics
+- URL: http://localhost:8000/api/topics/
+- Method: GET
+- Purpose: See all topics that have been extracted from crawled pages
+
+What you'll get:
+- List of all topics
+- Number of pages associated with each topic
+- Topic descriptions
+
+Step 7.2: Get Topics for a Specific Page
+- URL: http://localhost:8000/api/pages/{page_id}/topics/
+- Method: POST
+- Purpose: Manually trigger topic classification for a specific page
+
+Replace {page_id} with the actual page ID
+
+What you'll get:
+- Confirmation that topic classification has been scheduled
+- Page ID for reference
+
+================================================================================
+8. JOB MANAGEMENT
+================================================================================
+
+Step 8.1: Cancel a Running Job
+- URL: http://localhost:8000/api/jobs/{job_id}/cancel/
+- Method: POST
+- Purpose: Stop a running crawl job
+
+Replace {job_id} with the actual job ID
+
+What you'll get:
+- Confirmation that the job has been cancelled
+- Updated job status
+
+Step 8.2: Get Job Details
+- URL: http://localhost:8000/api/jobs/{job_id}/
+- Method: GET
+- Purpose: Get detailed information about a specific job
+
+Replace {job_id} with the actual job ID
+
+What you'll get:
+- Complete job information
+- Job description, status, and progress
+- URLs associated with the job
+
+Step 8.3: Start a Pending Job
+- URL: http://localhost:8000/api/jobs/{job_id}/
+- Method: POST
+- Purpose: Start a job that was created but not yet started
+
+Replace {job_id} with the actual job ID
+
+What you'll get:
+- Confirmation that the job has started
+- Number of URLs to be processed
+
+================================================================================
+9. RECRAWLING PAGES
+================================================================================
+
+Step 9.1: Recrawl a Specific Page
+- URL: http://localhost:8000/api/pages/{page_id}/
+- Method: POST
+- Purpose: Recrawl a page that was already crawled
+
+Replace {page_id} with the actual page ID
+
+What you'll get:
+- Confirmation that recrawl has been scheduled
+- Page ID for reference
+
+================================================================================
+10. TROUBLESHOOTING COMMON ISSUES
+================================================================================
+
+Issue 1: API returns "Connection refused"
+Solution: Make sure the application is running at http://localhost:8000
+
+Issue 2: Job status shows "pending" for a long time
+Solution: Check if Celery workers are running. The job will start when workers are available.
+
+Issue 3: Crawl fails with "403 Forbidden"
+Solution: The website may be blocking automated requests. Try setting respect_robots_txt to false.
+
+Issue 4: No topics are extracted
+Solution: Make sure classify_topics is set to true in your request. Topics are automatically extracted and stored in both the page's topics field and as PageTopic relationships.
+
+Issue 5: File upload fails
+Solution: Ensure your file is a .txt file with one URL per line.
+
+================================================================================
+11. BEST PRACTICES
+================================================================================
+
+1. Start with single URL crawling to test the system
+2. Use bulk crawling for multiple URLs to save time
+3. Monitor job status regularly for large bulk operations
+4. Use appropriate batch sizes (5-10 URLs) for bulk crawling
+5. Respect robots.txt to avoid being blocked by websites
+6. Check statistics regularly to monitor system performance
+7. Use the search and filter options when browsing pages
+8. Keep track of job IDs for monitoring progress
+
+================================================================================
+12. API RESPONSE FORMATS
+================================================================================
+
+Success Response (200/201):
+{
+    "status": "success",
+    "data": { ... },
+    "message": "Operation completed successfully"
+}
+
+Error Response (400/500):
+{
+    "error": "Error description",
+    "details": { ... }
+}
+
+Pagination Response:
+{
+    "data": [ ... ],
+    "pagination": {
+        "total_count": 100,
+        "total_pages": 5,
+        "current_page": 1,
+        "page_size": 20
+    }
+}
+
+================================================================================
+
+For support, refer to the Swagger documentation at:
+http://localhost:8000/api/docs/
+
+This guide covers all the main operations you can perform with the Web Crawler API.
+Start with single URL crawling and gradually move to bulk operations as you become familiar with the system.

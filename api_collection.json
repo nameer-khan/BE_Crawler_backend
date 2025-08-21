@@ -1,0 +1,884 @@
+{
+  "info": {
+    "name": "Web Crawler API Collection",
+    "description": "Complete API collection for the Django-based web crawler system with service layer architecture",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000/api",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Website Operations",
+      "item": [
+        {
+          "name": "Get Websites with Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/websites/?page=1&page_size=10",
+              "host": ["{{base_url}}"],
+              "path": ["websites", ""],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number for pagination"
+                },
+                {
+                  "key": "page_size",
+                  "value": "10",
+                  "description": "Number of items per page"
+                }
+              ]
+            },
+            "description": "Get all websites with crawling statistics and pagination"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/websites/?page=1&page_size=10",
+                  "host": ["{{base_url}}"],
+                  "path": ["websites", ""],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "page_size",
+                      "value": "10"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"websites\": [\n    {\n      \"id\": 1,\n      \"domain\": \"amazon.com\",\n      \"name\": \"Amazon\",\n      \"created_at\": \"2024-01-15T10:30:00Z\",\n      \"updated_at\": \"2024-01-15T10:30:00Z\"\n    },\n    {\n      \"id\": 2,\n      \"domain\": \"cnn.com\",\n      \"name\": \"CNN\",\n      \"created_at\": \"2024-01-15T11:00:00Z\",\n      \"updated_at\": \"2024-01-15T11:00:00Z\"\n    }\n  ],\n  \"pagination\": {\n    \"total_count\": 2,\n    \"total_pages\": 1,\n    \"current_page\": 1,\n    \"page_size\": 10\n  }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "CrawledPage Operations",
+      "item": [
+        {
+          "name": "Get Crawled Pages with Filters",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/pages/?status=completed&website_id=1&page=1&page_size=10",
+              "host": ["{{base_url}}"],
+              "path": ["pages", ""],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "completed",
+                  "description": "Filter by page status (pending, crawling, completed, failed, blocked)"
+                },
+                {
+                  "key": "website_id",
+                  "value": "1",
+                  "description": "Filter by website ID"
+                },
+                {
+                  "key": "category",
+                  "value": "technology",
+                  "description": "Filter by content category"
+                },
+                {
+                  "key": "search",
+                  "value": "toaster",
+                  "description": "Search in title, description, or URL"
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number for pagination"
+                },
+                {
+                  "key": "page_size",
+                  "value": "10",
+                  "description": "Number of items per page"
+                }
+              ]
+            },
+            "description": "Get crawled pages with optional filters and pagination"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/pages/?status=completed&page=1&page_size=10",
+                  "host": ["{{base_url}}"],
+                  "path": ["pages", ""],
+                  "query": [
+                    {
+                      "key": "status",
+                      "value": "completed"
+                    },
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "page_size",
+                      "value": "10"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"pages\": [\n    {\n      \"id\": 1,\n      \"url\": \"http://www.amazon.com/Cuisinart-CPT-122-Compact-2-Slice-Toaster/dp/B009GQ034C/\",\n      \"title\": \"Cuisinart CPT-122 Compact 2-Slice Toaster\",\n      \"description\": \"Compact 2-slice toaster with multiple browning settings\",\n      \"status\": \"completed\",\n      \"status_code\": 200,\n      \"content_type\": \"text/html\",\n      \"content_length\": 15420,\n      \"topics\": [\"automotive\", \"food\"],\n      \"category\": \"automotive\",\n      \"website\": {\n        \"id\": 1,\n        \"domain\": \"amazon.com\",\n        \"name\": \"Amazon\"\n      },\n      \"created_at\": \"2024-01-15T10:30:00Z\",\n      \"crawled_at\": \"2024-01-15T10:31:00Z\"\n    }\n  ],\n  \"pagination\": {\n    \"total_count\": 1,\n    \"total_pages\": 1,\n    \"current_page\": 1,\n    \"page_size\": 10\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Specific Page Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/pages/1/",
+              "host": ["{{base_url}}"],
+              "path": ["pages", "1", ""]
+            },
+            "description": "Get detailed information about a specific crawled page"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/pages/1/",
+                  "host": ["{{base_url}}"],
+                  "path": ["pages", "1", ""]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"id\": 1,\n  \"url\": \"http://www.amazon.com/Cuisinart-CPT-122-Compact-2-Slice-Toaster/dp/B009GQ034C/\",\n  \"title\": \"Cuisinart CPT-122 Compact 2-Slice Toaster\",\n  \"description\": \"Compact 2-slice toaster with multiple browning settings\",\n  \"keywords\": \"toaster, kitchen, appliance\",\n  \"author\": null,\n  \"language\": \"en\",\n  \"content\": \"<html>...</html>\",\n  \"text_content\": \"Cuisinart CPT-122 Compact 2-Slice Toaster with multiple browning settings...\",\n  \"status\": \"completed\",\n  \"status_code\": 200,\n  \"content_type\": \"text/html\",\n  \"content_length\": 15420,\n  \"encoding\": \"utf-8\",\n  \"headers\": {\n    \"server\": \"Server\",\n    \"content-type\": \"text/html; charset=utf-8\"\n  },\n  \"error_message\": null,\n  \"retry_count\": 0,\n  \"topics\": [\"automotive\", \"food\"],\n  \"category\": \"automotive\",\n  \"sentiment\": \"neutral\",\n  \"website\": {\n    \"id\": 1,\n    \"domain\": \"amazon.com\",\n    \"name\": \"Amazon\"\n  },\n  \"created_at\": \"2024-01-15T10:30:00Z\",\n  \"updated_at\": \"2024-01-15T10:31:00Z\",\n  \"crawled_at\": \"2024-01-15T10:31:00Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Recrawl Page",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/pages/1/",
+              "host": ["{{base_url}}"],
+              "path": ["pages", "1", ""]
+            },
+            "description": "Mark a page for recrawling"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/pages/1/",
+                  "host": ["{{base_url}}"],
+                  "path": ["pages", "1", ""]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"message\": \"Recrawl scheduled for http://www.amazon.com/Cuisinart-CPT-122-Compact-2-Slice-Toaster/dp/B009GQ034C/\",\n  \"page_id\": 1\n}"
+            }
+          ]
+        },
+        {
+          "name": "Classify Page Topics",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/pages/1/topics/",
+              "host": ["{{base_url}}"],
+              "path": ["pages", "1", "topics", ""]
+            },
+            "description": "Manually trigger topic classification for a page"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/pages/1/topics/",
+                  "host": ["{{base_url}}"],
+                  "path": ["pages", "1", "topics", ""]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"message\": \"Topic classification scheduled for page 1\",\n  \"page_id\": 1\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "CrawlJob Operations",
+      "item": [
+        {
+          "name": "Get Crawl Jobs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/jobs/?page=1&page_size=10",
+              "host": ["{{base_url}}"],
+              "path": ["jobs", ""],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number for pagination"
+                },
+                {
+                  "key": "page_size",
+                  "value": "10",
+                  "description": "Number of items per page"
+                }
+              ]
+            },
+            "description": "Get all crawl jobs with pagination"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/jobs/?page=1&page_size=10",
+                  "host": ["{{base_url}}"],
+                  "path": ["jobs", ""],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "page_size",
+                      "value": "10"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"jobs\": [\n    {\n      \"id\": 1,\n      \"name\": \"Bulk crawl - 3 URLs\",\n      \"description\": \"Bulk crawl of 3 URLs\",\n      \"status\": \"completed\",\n      \"total_urls\": 3,\n      \"completed_urls\": 2,\n      \"failed_urls\": 1,\n      \"progress\": 100.0,\n      \"batch_size\": 10,\n      \"started_at\": \"2024-01-15T10:30:00Z\",\n      \"completed_at\": \"2024-01-15T10:35:00Z\",\n      \"created_at\": \"2024-01-15T10:30:00Z\"\n    }\n  ],\n  \"pagination\": {\n    \"total_count\": 1,\n    \"total_pages\": 1,\n    \"current_page\": 1,\n    \"page_size\": 10\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Crawl Job",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Crawl Job\",\n  \"description\": \"Testing the crawler API\",\n  \"urls_list\": [\n    \"http://www.amazon.com/Cuisinart-CPT-122-Compact-2-Slice-Toaster/dp/B009GQ034C/\",\n    \"https://blog.rei.com/camp/how-to-introduce-your-indoorsy-friend-to-the-outdoors/\",\n    \"https://www.cnn.com/2013/06/10/politics/edward-snowden-profile/\"\n  ],\n  \"batch_size\": 5\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/jobs/",
+              "host": ["{{base_url}}"],
+              "path": ["jobs", ""]
+            },
+            "description": "Create a new crawl job with URLs"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Test Crawl Job\",\n  \"description\": \"Testing the crawler API\",\n  \"urls_list\": [\n    \"http://www.amazon.com/Cuisinart-CPT-122-Compact-2-Slice-Toaster/dp/B009GQ034C/\",\n    \"https://blog.rei.com/camp/how-to-introduce-your-indoorsy-friend-to-the-outdoors/\",\n    \"https://www.cnn.com/2013/06/10/politics/edward-snowden-profile/\"\n  ],\n  \"batch_size\": 5\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/jobs/",
+                  "host": ["{{base_url}}"],
+                  "path": ["jobs", ""]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"id\": 2,\n  \"name\": \"Test Crawl Job\",\n  \"description\": \"Testing the crawler API\",\n  \"status\": \"pending\",\n  \"total_urls\": 3,\n  \"completed_urls\": 0,\n  \"failed_urls\": 0,\n  \"progress\": 0.0,\n  \"batch_size\": 5,\n  \"started_at\": null,\n  \"completed_at\": null,\n  \"created_at\": \"2024-01-15T11:00:00Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Job Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/jobs/1/",
+              "host": ["{{base_url}}"],
+              "path": ["jobs", "1", ""]
+            },
+            "description": "Get detailed information about a specific crawl job"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/jobs/1/",
+                  "host": ["{{base_url}}"],
+                  "path": ["jobs", "1", ""]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"id\": 1,\n  \"name\": \"Bulk crawl - 3 URLs\",\n  \"description\": \"Bulk crawl of 3 URLs\",\n  \"status\": \"completed\",\n  \"total_urls\": 3,\n  \"completed_urls\": 2,\n  \"failed_urls\": 1,\n  \"progress\": 100.0,\n  \"batch_size\": 10,\n  \"urls_list\": [\n    \"http://www.amazon.com/Cuisinart-CPT-122-Compact-2-Slice-Toaster/dp/B009GQ034C/\",\n    \"https://blog.rei.com/camp/how-to-introduce-your-indoorsy-friend-to-the-outdoors/\",\n    \"https://www.cnn.com/2013/06/10/politics/edward-snowden-profile/\"\n  ],\n  \"started_at\": \"2024-01-15T10:30:00Z\",\n  \"completed_at\": \"2024-01-15T10:35:00Z\",\n  \"created_at\": \"2024-01-15T10:30:00Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Start Crawl Job",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/jobs/2/",
+              "host": ["{{base_url}}"],
+              "path": ["jobs", "2", ""]
+            },
+            "description": "Start a pending crawl job"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/jobs/2/",
+                  "host": ["{{base_url}}"],
+                  "path": ["jobs", "2", ""]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"message\": \"Started crawling 3 URLs\",\n  \"job_id\": 2,\n  \"total_urls\": 3\n}"
+            }
+          ]
+        },
+        {
+          "name": "Cancel Crawl Job",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/jobs/2/cancel/",
+              "host": ["{{base_url}}"],
+              "path": ["jobs", "2", "cancel", ""]
+            },
+            "description": "Cancel a running or pending crawl job"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/jobs/2/cancel/",
+                  "host": ["{{base_url}}"],
+                  "path": ["jobs", "2", "cancel", ""]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"message\": \"Job cancelled successfully\",\n  \"job_id\": 2\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Job Status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/jobs/1/status/",
+              "host": ["{{base_url}}"],
+              "path": ["jobs", "1", "status", ""]
+            },
+            "description": "Get detailed status information for a crawl job"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/jobs/1/status/",
+                  "host": ["{{base_url}}"],
+                  "path": ["jobs", "1", "status", ""]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"job_id\": 1,\n  \"name\": \"Bulk crawl - 3 URLs\",\n  \"status\": \"completed\",\n  \"progress_percentage\": 100.0,\n  \"total_urls\": 3,\n  \"processed_urls\": 3,\n  \"successful_urls\": 2,\n  \"failed_urls\": 1,\n  \"started_at\": \"2024-01-15T10:30:00Z\",\n  \"completed_at\": \"2024-01-15T10:35:00Z\",\n  \"estimated_completion\": null\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Topic Operations",
+      "item": [
+        {
+          "name": "Get Topics with Page Counts",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/topics/",
+              "host": ["{{base_url}}"],
+              "path": ["topics", ""]
+            },
+            "description": "Get all topics with the number of pages associated with each topic"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/topics/",
+                  "host": ["{{base_url}}"],
+                  "path": ["topics", ""]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"topics\": [\n    {\n      \"id\": 1,\n      \"name\": \"automotive\",\n      \"description\": \"Automotive and vehicle related content\",\n      \"page_count\": 15\n    },\n    {\n      \"id\": 2,\n      \"name\": \"technology\",\n      \"description\": \"Technology and software related content\",\n      \"page_count\": 12\n    },\n    {\n      \"id\": 3,\n      \"name\": \"politics\",\n      \"description\": \"Political news and analysis\",\n      \"page_count\": 8\n    }\n  ],\n  \"total_count\": 3\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Crawler Operations",
+      "item": [
+        {
+          "name": "Crawl Single URL",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"url\": \"http://www.amazon.com/Cuisinart-CPT-122-Compact-2-Slice-Toaster/dp/B009GQ034C/\",\n  \"extract_content\": true,\n  \"classify_topics\": true,\n  \"respect_robots_txt\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/crawler/url/",
+              "host": ["{{base_url}}"],
+              "path": ["crawler", "url", ""]
+            },
+            "description": "Crawl a single URL and return results immediately"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"url\": \"http://www.amazon.com/Cuisinart-CPT-122-Compact-2-Slice-Toaster/dp/B009GQ034C/\",\n  \"extract_content\": true,\n  \"classify_topics\": true,\n  \"respect_robots_txt\": true\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/crawler/url/",
+                  "host": ["{{base_url}}"],
+                  "path": ["crawler", "url", ""]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"url\": \"http://www.amazon.com/Cuisinart-CPT-122-Compact-2-Slice-Toaster/dp/B009GQ034C/\",\n  \"status\": \"completed\",\n  \"title\": \"Cuisinart CPT-122 Compact 2-Slice Toaster\",\n  \"description\": \"Compact 2-slice toaster with multiple browning settings\",\n  \"content_preview\": \"Cuisinart CPT-122 Compact 2-Slice Toaster with multiple browning settings and automatic shutoff...\",\n  \"topics\": [\"automotive\", \"food\"],\n  \"status_code\": 200,\n  \"content_type\": \"text/html\",\n  \"content_length\": 15420,\n  \"error_message\": null,\n  \"processing_time\": 2.45,\n  \"crawled_at\": \"2024-01-15T11:00:00Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Bulk Crawl URLs",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"urls\": [\n    \"http://www.amazon.com/Cuisinart-CPT-122-Compact-2-Slice-Toaster/dp/B009GQ034C/\",\n    \"https://blog.rei.com/camp/how-to-introduce-your-indoorsy-friend-to-the-outdoors/\",\n    \"https://www.cnn.com/2013/06/10/politics/edward-snowden-profile/\"\n  ],\n  \"batch_size\": 5\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/crawler/bulk/",
+              "host": ["{{base_url}}"],
+              "path": ["crawler", "bulk", ""]
+            },
+            "description": "Start bulk crawling of multiple URLs (asynchronous)"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"urls\": [\n    \"http://www.amazon.com/Cuisinart-CPT-122-Compact-2-Slice-Toaster/dp/B009GQ034C/\",\n    \"https://blog.rei.com/camp/how-to-introduce-your-indoorsy-friend-to-the-outdoors/\",\n    \"https://www.cnn.com/2013/06/10/politics/edward-snowden-profile/\"\n  ],\n  \"batch_size\": 5\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/crawler/bulk/",
+                  "host": ["{{base_url}}"],
+                  "path": ["crawler", "bulk", ""]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"message\": \"Bulk crawl started for 3 URLs\",\n  \"job_id\": 3,\n  \"total_urls\": 3,\n  \"batch_size\": 5\n}"
+            }
+          ]
+        },
+        {
+          "name": "Crawl from File",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "multipart/form-data"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "test_urls.txt",
+                  "description": "Text file containing URLs (one per line)"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/crawler/file/",
+              "host": ["{{base_url}}"],
+              "path": ["crawler", "file", ""]
+            },
+            "description": "Upload a text file containing URLs to crawl (asynchronous)"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "multipart/form-data"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "file",
+                      "type": "file",
+                      "src": "test_urls.txt"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/crawler/file/",
+                  "host": ["{{base_url}}"],
+                  "path": ["crawler", "file", ""]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"message\": \"File crawl started for 3 URLs\",\n  \"job_id\": 4,\n  \"total_urls\": 3,\n  \"filename\": \"test_urls.txt\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Crawler Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/crawler/stats/",
+              "host": ["{{base_url}}"],
+              "path": ["crawler", "stats", ""]
+            },
+            "description": "Get comprehensive crawling statistics"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/crawler/stats/",
+                  "host": ["{{base_url}}"],
+                  "path": ["crawler", "stats", ""]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"pages\": {\n    \"total_pages\": 25,\n    \"completed_pages\": 20,\n    \"failed_pages\": 3,\n    \"pending_pages\": 1,\n    \"crawling_pages\": 1,\n    \"success_rate\": 80.0,\n    \"avg_content_length\": 12500,\n    \"pages_last_24h\": 15\n  },\n  \"websites\": {\n    \"total\": 8,\n    \"active\": 6\n  },\n  \"jobs\": {\n    \"total\": 12,\n    \"active\": 2,\n    \"completed\": 8\n  },\n  \"topics\": {\n    \"total\": 15\n  }\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
