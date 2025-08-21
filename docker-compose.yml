@@ -1,0 +1,111 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: webcrawler
+      POSTGRES_USER: webcrawler
+      POSTGRES_PASSWORD: webcrawler123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U webcrawler -d webcrawler"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  web:
+    build: .
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/app
+      - static_volume:/app/staticfiles
+      - ./logs:/app/logs
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://webcrawler:webcrawler123@db:5432/webcrawler
+      - REDIS_URL=redis://redis:6379/0
+      - DJANGO_SETTINGS_MODULE=webcrawler.settings
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/crawler/stats/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  celery:
+    build: .
+    command: >
+      sh -c "python manage.py migrate &&
+             celery -A webcrawler worker -l info --concurrency=2"
+    volumes:
+      - .:/app
+      - ./logs:/app/logs
+    environment:
+      - DATABASE_URL=postgresql://webcrawler:webcrawler123@db:5432/webcrawler
+      - REDIS_URL=redis://redis:6379/0
+      - DJANGO_SETTINGS_MODULE=webcrawler.settings
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      web:
+        condition: service_healthy
+    restart: unless-stopped
+
+  celery-beat:
+    build: .
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py shell -c 'from django_celery_beat.models import PeriodicTask; print(\"Celery Beat tables ready\")' &&
+             celery -A webcrawler beat -l info"
+    volumes:
+      - .:/app
+      - ./logs:/app/logs
+    environment:
+      - DATABASE_URL=postgresql://webcrawler:webcrawler123@db:5432/webcrawler
+      - REDIS_URL=redis://redis:6379/0
+      - DJANGO_SETTINGS_MODULE=webcrawler.settings
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      web:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+  static_volume:
