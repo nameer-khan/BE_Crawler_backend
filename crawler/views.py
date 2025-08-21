@@ -75,17 +75,17 @@ def api_root(request, format=None):
 class WebsiteAPIView(APIView):
     """
     API view for Website operations.
-    
+
     Provides endpoints to retrieve website information with crawling statistics.
     """
-    
+
     def get(self, request, *args, **kwargs):
         """
         Get websites with statistics and pagination.
-        
+
         Returns a list of websites with their crawling statistics including
         total pages crawled, success/failure counts, and pagination information.
-        
+
         Query Parameters:
         - page: Page number for pagination (default: 1)
         - page_size: Number of items per page (default: 20)
@@ -430,17 +430,17 @@ class TopicAPIView(APIView):
 class CrawlURLAPIView(APIView):
     """
     API view for crawling a single URL.
-    
+
     Provides endpoint to crawl a single URL and return immediate results.
     """
-    
+
     def post(self, request, *args, **kwargs):
         """
         Crawl a single URL and return results.
-        
+
         Crawls the specified URL and returns extracted content, metadata,
         and topic classification if requested.
-        
+
         Request Body:
         - url: The URL to crawl (required)
         - extract_content: Whether to extract page content (default: true)
@@ -463,7 +463,7 @@ class CrawlURLAPIView(APIView):
             newrelic.agent.add_custom_attribute('extract_content', extract_content)
             newrelic.agent.add_custom_attribute('classify_topics', classify_topics)
             newrelic.agent.add_custom_attribute('respect_robots_txt', respect_robots_txt)
-        
+
         start_time = time.time()
         
         try:
@@ -565,7 +565,7 @@ class CrawlBulkAPIView(APIView):
         if newrelic:
             newrelic.agent.add_custom_attribute('url_count', len(urls))
             newrelic.agent.add_custom_attribute('batch_size', batch_size)
-        
+
         try:
             # Process bulk URLs through service layer
             crawler_service = CrawlerDatabaseService()
@@ -575,7 +575,7 @@ class CrawlBulkAPIView(APIView):
             classify_topics = data.get('classify_topics', True)
             extract_content = data.get('extract_content', True)
             respect_robots_txt = data.get('respect_robots_txt', True)
-            
+
             # Try to start bulk crawling with Celery
             try:
                 crawl_bulk_urls.delay(urls, result['job_id'], classify_topics, extract_content, respect_robots_txt)
@@ -643,7 +643,7 @@ class CrawlFromFileAPIView(APIView):
             
             # Start bulk crawling with default classification parameters
             crawl_bulk_urls.delay(urls, result['job_id'], True, True, True)
-            
+
             return Response({
                 'message': f'File crawl started for {len(urls)} URLs',
                 'job_id': result['job_id'],
@@ -666,7 +666,7 @@ class CrawlerStatsAPIView(APIView):
         # New Relic custom attributes
         if newrelic:
             newrelic.agent.add_custom_attribute('endpoint', 'crawler_stats')
-        
+
         crawler_service = CrawlerDatabaseService()
         stats = crawler_service.get_crawler_stats()
         

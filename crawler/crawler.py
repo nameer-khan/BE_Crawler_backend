@@ -65,7 +65,7 @@ class WebCrawler:
             newrelic.agent.add_custom_attribute('url', url)
             newrelic.agent.add_custom_attribute('user_agent', self.user_agent)
             newrelic.agent.add_custom_attribute('respect_robots_txt', self.respect_robots_txt)
-        
+
         start_time = time.time()
         try:
             # Check robots.txt if enabled
@@ -211,7 +211,7 @@ class WebCrawler:
             
             # Calculate processing time
             processing_time = time.time() - start_time
-            
+
             # New Relic custom attributes for successful crawl
             if newrelic:
                 newrelic.agent.add_custom_attribute('processing_time', processing_time)
@@ -219,7 +219,7 @@ class WebCrawler:
                 newrelic.agent.add_custom_attribute('content_length', len(response.content))
                 newrelic.agent.add_custom_attribute('topics_count', len(topics))
                 newrelic.agent.add_custom_attribute('crawl_status', 'completed')
-            
+
             return {
                 'status': 'completed',
                 'url': url,
@@ -242,13 +242,13 @@ class WebCrawler:
             
         except Exception as e:
             logger.error(f"Error crawling {url}: {str(e)}")
-            
+
             # New Relic error recording
             if newrelic:
                 newrelic.agent.record_exception(e)
                 newrelic.agent.add_custom_attribute('crawl_status', 'failed')
                 newrelic.agent.add_custom_attribute('error_message', str(e))
-            
+
             return {
                 'status': 'failed',
                 'url': url,

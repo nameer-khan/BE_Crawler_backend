@@ -35,7 +35,7 @@ def crawl_single_url(self, url: str, job_id: int = None):
 def crawl_single_url_with_params(self, url: str, job_id: int = None, classify_topics: bool = True, extract_content: bool = True, respect_robots_txt: bool = True):
     """
     Crawl a single URL and store results with configurable parameters.
-    
+
     Args:
         url: URL to crawl
         job_id: Optional crawl job ID for tracking
@@ -50,7 +50,7 @@ def crawl_single_url_with_params(self, url: str, job_id: int = None, classify_to
         newrelic.agent.add_custom_attribute('classify_topics', classify_topics)
         newrelic.agent.add_custom_attribute('extract_content', extract_content)
         newrelic.agent.add_custom_attribute('respect_robots_txt', respect_robots_txt)
-    
+
     try:
         # Get or create website
         domain = urlparse(url).netloc
@@ -87,7 +87,7 @@ def crawl_single_url_with_params(self, url: str, job_id: int = None, classify_to
         page.headers = result['headers']
         page.error_message = result['error_message']
         page.topics = result['topics'] if classify_topics else []
-        
+
         if result['status'] == 'completed':
             page.crawled_at = timezone.now()
         
@@ -100,24 +100,24 @@ def crawl_single_url_with_params(self, url: str, job_id: int = None, classify_to
                 # Create topic with proper slug
                 from django.utils.text import slugify
                 topic_slug = slugify(topic_name)
-                
+
                 topic, created = Topic.objects.get_or_create(
                     name=topic_name,
                     defaults={'slug': topic_slug}
                 )
-                
+
                 # Create or update PageTopic relationship
                 page_topic, created = PageTopic.objects.get_or_create(
                     page=page,
                     topic=topic,
                     defaults={'confidence': 1.0, 'source': 'automatic'}
                 )
-                
+
                 if created:
                     created_count += 1
-            
+
             logger.info(f"Created {created_count} PageTopic relationships for page {page.id}")
-        
+
         # Update job progress if job_id provided
         if job_id:
             # Don't pass specific counts, let the task calculate from database

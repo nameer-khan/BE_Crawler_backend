@@ -8,7 +8,7 @@ from . import views
 urlpatterns = [
     # API root
     path('', views.api_root, name='api-root'),
-    
+
     # Website endpoints
     path('websites/', views.WebsiteAPIView.as_view(), name='websites'),
     

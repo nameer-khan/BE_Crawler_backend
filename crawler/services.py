@@ -319,17 +319,17 @@ class CrawlerDatabaseService:
         if newrelic:
             newrelic.agent.add_custom_attribute('service_method', 'process_single_url')
             newrelic.agent.add_custom_attribute('url', url)
-        
+
         try:
             domain = urlparse(url).netloc
             website, created = self.website_service.get_or_create_website(domain)
-            
+
             page, created = self.page_service.get_or_create_page(
                 url=url,
                 website=website,
                 crawl_status='pending'
             )
-            
+
             return {
                 'page_id': page.id,
                 'website_id': website.id,
@@ -349,20 +349,20 @@ class CrawlerDatabaseService:
             newrelic.agent.add_custom_attribute('service_method', 'process_bulk_urls')
             newrelic.agent.add_custom_attribute('url_count', len(urls))
             newrelic.agent.add_custom_attribute('job_name', job_name)
-        
+
         try:
             if not job_name:
                 job_name = f"Bulk crawl {len(urls)} URLs - {timezone.now().strftime('%Y-%m-%d %H:%M')}"
-            
+
             # Create crawl job
             job = self.job_service.create_job(name=job_name, urls=urls)
-            
+
             # Process each URL
             processed_urls = []
             for url in urls:
                 result = self.process_single_url(url)
                 processed_urls.append(result)
-            
+
             return {
                 'job_id': job.id,
                 'job_name': job.name,
@@ -380,24 +380,24 @@ class CrawlerDatabaseService:
         # New Relic custom attributes
         if newrelic:
             newrelic.agent.add_custom_attribute('service_method', 'get_crawler_stats')
-        
+
         try:
             page_stats = self.page_service.get_crawling_stats()
-            
+
             # Website stats
             total_websites = Website.active_objects.count()
             active_websites = Website.active_objects.filter(
                 pages__crawl_status='completed'
             ).distinct().count()
-            
+
             # Job stats
             total_jobs = CrawlJob.active_objects.count()
             active_jobs = CrawlJob.active_objects.filter(job_status='running').count()
             completed_jobs = CrawlJob.active_objects.filter(job_status='completed').count()
-            
+
             # Topic stats
             total_topics = Topic.active_objects.count()
-            
+
             return {
                 'pages': page_stats,
                 'websites': {
