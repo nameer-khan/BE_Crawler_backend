@@ -131,15 +131,14 @@ This document outlines the implementation plan for the web crawler system Proof 
 ### Team Composition
 
 #### Core Team (8 weeks)
-- **2 Senior Backend Developers**: Django, Celery, PostgreSQL
+- **2 Backend Developers**: Django, Celery, PostgreSQL, Load testing, optimization
 - **1 DevOps Engineer**: Docker, CI/CD, Infrastructure
 - **1 Data Scientist**: Topic classification, ML models
-- **1 Performance Engineer**: Load testing, optimization
 - **1 QA Engineer**: Testing, validation
 
 #### Support Team (As needed)
 - **1 Frontend Developer**: Admin interface improvements
-- **1 Security Engineer**: Security review
+- **1 Security/ DevOps/ Senior Backend Engineer/ Architech**: Security review
 - **1 Product Manager**: Requirements clarification
 
 ### Infrastructure Requirements
@@ -150,25 +149,20 @@ This document outlines the implementation plan for the web crawler system Proof 
 - **Testing Environment**: Staging environment for integration tests
 
 #### Production-like Environment
-- **Compute**: 4-8 CPU cores, 16-32GB RAM
-- **Database**: PostgreSQL with 100GB storage
-- **Cache**: Redis cluster
-- **Storage**: Object storage for content
-- **Monitoring**: Prometheus, Grafana, ELK stack
+- **Compute**: t3.large for prod , t3.medium for staging
+- **Database**: PostgreSQL with 10GB storage (Dev) , 100GB Prod (Autoscaling On if needed)
+- **Cache**: Redis cluster (ElasticCache)
+- **Storage**: S3
+- **Monitoring**: NewRelic, Prometheus, Grafana, ELK stack , atop 
 
 ### Estimated Costs
 
 #### Development Phase (8 weeks)
-- **Team Costs**: $80,000 - $120,000
-- **Infrastructure**: $2,000 - $5,000
-- **Tools & Services**: $1,000 - $2,000
-- **Total**: $83,000 - $127,000
 
-#### Monthly Operational Costs (Post-PoC)
-- **Infrastructure**: $5,000 - $15,000/month
-- **Monitoring**: $1,000 - $3,000/month
-- **Support**: $10,000 - $20,000/month
-- **Total**: $16,000 - $38,000/month
+#### Monthly Operational Costs (Development Phase)
+- **Infrastructure**: Purely Depends on Workload (Less than $100 approx during dev phase)
+- **Monitoring**: (NewRelic plans 100GB ingestion free) , (Free in Dev, For Prod Pricing plan need to be checked)
+
 
 ## Risk Assessment & Mitigation
 
