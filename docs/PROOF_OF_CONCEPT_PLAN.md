@@ -62,7 +62,7 @@ This document outlines the implementation plan for the web crawler system Proof 
 
 #### Week 4: Topic Classification
 - [ ] Implement keyword-based classification
-- [ ] Add machine learning classification (optional)
+- [ ] Add machine learning classification
 - [ ] Create topic taxonomy
 - [ ] Implement confidence scoring
 - [ ] Add classification accuracy metrics
