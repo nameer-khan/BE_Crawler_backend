@@ -45,7 +45,7 @@ A Django-based web crawler system that can crawl URLs, extract content, and clas
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd Brightedge-SEO
+   cd BE_Crawler_backend
    ```
 
 2. **Start the services (First time load might take a few minutes)**
